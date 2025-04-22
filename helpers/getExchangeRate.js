@@ -10,9 +10,8 @@ async function getExchangeRate() {
         const rate = data.usd.idr
         return rate
     } catch (error) {
-
+        throw ({ code: 404, message: "Exchange rate is not found" })
     }
 }
 
-console.log(getExchangeRate())
 module.exports = getExchangeRate
