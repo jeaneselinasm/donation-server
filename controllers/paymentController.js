@@ -21,7 +21,7 @@ class PaymentController {
             const rateUsdToIdr = await getExchangeRate();
 
             let snap = new midtransClient.Snap({
-                isProduction: false,
+                isProduction: true,
                 serverKey: process.env.MID_TRANS_SERVER_KEY,
             });
             const conversionRates = {
