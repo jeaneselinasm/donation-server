@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const midtransClient = require("midtrans-client");
 const getExchangeRate = require("../helpers/getExchangeRate");
 const nodemailer = require("nodemailer");
+const createThankYouCard = require("../helpers/sendThankYouCard");
 class PaymentController {
     static async generatePayment(req, res, next) {
         try {
@@ -117,7 +118,7 @@ class PaymentController {
             console.log(">> name", name);
             console.log(">> amount", amount);
             console.log(">> orderId", orderId);
-
+            const imagePath = await createThankYouCard(name)
             const transporter = nodemailer.createTransport({
                 // service: "gmail",
                 host: "smtp.gmail.com",
@@ -132,18 +133,38 @@ class PaymentController {
                 socketTimeout: 10000,
             });
 
+            //     const mailOptions = {
+            //         from: `'Bahtraku Donation'${process.env.USER}`,
+            //         to,
+            //         subject: "Thank you for your donation!",
+            //         html: `
+            //         <p>Hi ${name || "Donor"},</p>
+            // <p>Thank you for your generous donation of <strong>IDR ${amount}</strong>.</p>
+            // <p>Your donation ID is: <strong>${orderId}</strong>.</p>
+            // <p>We appreciate your support!</p>
+            // <br/>
+            // <p>Regards,<br/>Your Organization</p>
+            //         `,
+            //     };
+
             const mailOptions = {
                 from: `'Bahtraku Donation'${process.env.USER}`,
                 to,
                 subject: "Thank you for your donation!",
                 html: `
-                <p>Hi ${name || "Donor"},</p>
-        <p>Thank you for your generous donation of <strong>IDR ${amount}</strong>.</p>
-        <p>Your donation ID is: <strong>${orderId}</strong>.</p>
-        <p>We appreciate your support!</p>
-        <br/>
-        <p>Regards,<br/>Your Organization</p>
-                `,
+            <p>Hi ${name || "Donor"},</p>
+    <p>Thank you for your generous donation of <strong>IDR ${amount}</strong>.</p>
+    <p>Your donation ID is: <strong>${orderId}</strong>.</p>
+    <p>We appreciate your support!</p>
+    <br/>
+    <p>Regards,<br/>Your Organization</p>
+            `,
+                attachments: [
+                    {
+                        filename: `thankyou-${name}.png`,
+                        path: imagePath
+                    }
+                ]
             };
 
             await transporter.sendMail(mailOptions);
@@ -160,6 +181,8 @@ class PaymentController {
             // next(error);
         }
     }
+
+
 }
 
 module.exports = PaymentController;
