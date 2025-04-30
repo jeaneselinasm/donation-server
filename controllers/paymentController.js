@@ -119,11 +119,17 @@ class PaymentController {
             console.log(">> orderId", orderId);
 
             const transporter = nodemailer.createTransport({
-                servicev: "gmail",
+                // service: "gmail",
+                host: "smtp.gmail.com",
+                port: 587,
+                secure: false,
                 auth: {
                     user: process.env.USER,
                     pass: process.env.PASS,
                 },
+                connectionTimeout: 10000,
+                greetingTimeout: 5000,
+                socketTimeout: 10000,
             });
 
             const mailOptions = {
@@ -141,9 +147,17 @@ class PaymentController {
             };
 
             await transporter.sendMail(mailOptions);
+
+            transporter.verify((error, success) => {
+                if (error) {
+                    console.error("SMTP connection error:", error);
+                } else {
+                    console.log("SMTP server is ready to send messages");
+                }
+            });
         } catch (error) {
             console.log("error send email notification : ", error);
-            next(error);
+            // next(error);
         }
     }
 }
