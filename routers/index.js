@@ -7,4 +7,5 @@ router.get("/example", (req, res) => {
 });
 
 router.post("/payment", PaymentController.generatePayment);
+router.post("/payment/notification", PaymentController.handleNotification);
 module.exports = router;
